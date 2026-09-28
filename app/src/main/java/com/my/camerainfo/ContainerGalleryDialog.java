@@ -35,7 +35,9 @@ public class ContainerGalleryDialog {
     public static void showContainerGallery(Context context, CaptureContainerManager containerManager, OnProcessCallback callback) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_container_gallery, null);
         ListView lvContainers = dialogView.findViewById(R.id.lv_containers);
+        Button btnSelectAll = dialogView.findViewById(R.id.btn_select_all);
         Button btnProcessSelected = dialogView.findViewById(R.id.btn_process_selected);
+        Button btnDeleteSelected = dialogView.findViewById(R.id.btn_delete_selected);
         Button btnClose = dialogView.findViewById(R.id.btn_close_gallery);
 
         List<File> containers = containerManager.getAllSessionContainers();
@@ -53,6 +55,15 @@ public class ContainerGalleryDialog {
 
         lvContainers.setAdapter(adapter);
 
+        btnSelectAll.setOnClickListener(v -> {
+            if (selectedContainers.size() == containers.size()) {
+                selectedContainers.clear();
+            } else {
+                selectedContainers.addAll(containers);
+            }
+            adapter.notifyDataSetChanged();
+        });
+
         btnProcessSelected.setOnClickListener(v -> {
             if (selectedContainers.isEmpty()) {
                 Toast.makeText(context, "Select at least one container to process", Toast.LENGTH_SHORT).show();
@@ -60,6 +71,36 @@ public class ContainerGalleryDialog {
             }
             dialog.dismiss();
             showProcessPreferencesModal(context, new ArrayList<>(selectedContainers), callback);
+        });
+
+        btnDeleteSelected.setOnClickListener(v -> {
+            if (selectedContainers.isEmpty()) {
+                Toast.makeText(context, "Select at least one container to delete", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete Selected Containers")
+                    .setMessage("Are you sure you want to delete " + selectedContainers.size() + " selected container(s)?")
+                    .setPositiveButton("Delete All", (d, w) -> {
+                        int count = selectedContainers.size();
+                        for (File sessionDir : new ArrayList<>(selectedContainers)) {
+                            File[] files = sessionDir.listFiles();
+                            if (files != null) {
+                                for (File f : files) {
+                                    f.delete();
+                                }
+                            }
+                            sessionDir.delete();
+                        }
+                        selectedContainers.clear();
+                        List<File> updated = containerManager.getAllSessionContainers();
+                        containers.clear();
+                        containers.addAll(updated);
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(context, "Deleted " + count + " container(s)", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
@@ -210,20 +251,40 @@ public class ContainerGalleryDialog {
             }
 
             Set<File> selectedFrames = new HashSet<>();
-            ArrayAdapter<String> frameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1) {
+            BaseAdapter frameAdapter = new BaseAdapter() {
                 @Override
                 public int getCount() {
                     return frameFiles.size();
                 }
 
                 @Override
+                public Object getItem(int position) {
+                    if (position >= 0 && position < frameFiles.size()) {
+                        return frameFiles.get(position);
+                    }
+                    return null;
+                }
+
+                @Override
+                public long getItemId(int position) {
+                    return position;
+                }
+
+                @Override
                 public View getView(int pos, View convert, ViewGroup parentGrid) {
-                    TextView tv = (TextView) super.getView(pos, convert, parentGrid);
+                    TextView tv;
+                    if (convert instanceof TextView) {
+                        tv = (TextView) convert;
+                    } else {
+                        tv = new TextView(context);
+                        tv.setPadding(12, 12, 12, 12);
+                    }
+                    if (pos < 0 || pos >= frameFiles.size()) return tv;
                     File f = frameFiles.get(pos);
                     tv.setTextColor(Color.WHITE);
                     tv.setTextSize(10);
                     boolean isSel = selectedFrames.contains(f);
-                    tv.setText((isSel ? "DEL: " : "") + f.getName());
+                    tv.setText((isSel ? "[X] " : "") + f.getName());
                     tv.setBackgroundColor(isSel ? 0xFF880000 : 0xFF333333);
                     return tv;
                 }
@@ -303,7 +364,7 @@ public class ContainerGalleryDialog {
             try {
                 File zipFile = containerManager.exportContainerToZip(sessionDir, context);
                 if (zipFile != null) {
-                    Toast.makeText(context, "Exported ZIP: Pictures/CameraInfo/RawExports/" + zipFile.getName(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Exported: RawExports/" + sessionDir.getName() + "/images", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(context, "Failed to export ZIP", Toast.LENGTH_SHORT).show();
                 }

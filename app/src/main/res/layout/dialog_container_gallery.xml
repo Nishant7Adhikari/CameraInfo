@@ -18,15 +18,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Select sessions to batch process or manage raw container frames:"
+        android:text="Select sessions to batch process or batch delete raw container frames:"
         android:textColor="#CCCCCC"
         android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/btn_select_all"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:background="#333333"
+        android:text="SELECT ALL / CLEAR"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp" />
 
     <ListView
         android:id="@+id/lv_containers"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="260dp"
+        android:layout_marginTop="8dp"
         android:divider="#333333"
         android:dividerHeight="1dp" />
 
@@ -41,23 +52,36 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="1"
             android:background="#FF00897B"
             android:text="PROCESS SELECTED"
             android:textColor="#FFFFFF"
-            android:textSize="11sp" />
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/btn_delete_selected"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="#D32F2F"
+            android:text="DELETE SELECTED"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/btn_close_gallery"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="2dp"
             android:layout_weight="1"
             android:background="#444444"
             android:text="CLOSE"
             android:textColor="#FFFFFF"
-            android:textSize="11sp" />
+            android:textSize="10sp" />
     </LinearLayout>
 </LinearLayout>

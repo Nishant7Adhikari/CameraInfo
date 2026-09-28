@@ -107,37 +107,86 @@ public class CaptureContainerManager {
     public File exportContainerToZip(File sessionDir, Context context) throws IOException {
         if (sessionDir == null || !sessionDir.exists() || !sessionDir.isDirectory()) return null;
 
-        File exportDir;
+        File rawExportsBaseDir;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            exportDir = new File(picturesDir, "CameraInfo/RawExports");
+            rawExportsBaseDir = new File(picturesDir, "CameraInfo/RawExports");
         } else {
-            exportDir = new File(context.getFilesDir(), "Exports");
+            rawExportsBaseDir = new File(context.getFilesDir(), "RawExports");
         }
 
-        if (!exportDir.exists()) exportDir.mkdirs();
+        String containerName = sessionDir.getName();
+        File containerExportDir = new File(rawExportsBaseDir, containerName);
+        File imagesExportDir = new File(containerExportDir, "images");
 
-        File zipFile = new File(exportDir, sessionDir.getName() + ".zip");
+        if (!imagesExportDir.exists()) {
+            imagesExportDir.mkdirs();
+        }
+
         File[] files = sessionDir.listFiles();
         if (files == null || files.length == 0) return null;
+
+        for (File file : files) {
+            if (file.isDirectory()) continue;
+            File destFile;
+            if (file.getName().endsWith(".json")) {
+                destFile = new File(containerExportDir, file.getName());
+            } else {
+                destFile = new File(imagesExportDir, file.getName());
+            }
+            copyFile(file, destFile);
+        }
+
+        File zipFile = new File(containerExportDir, containerName + ".zip");
 
         try (FileOutputStream fos = new FileOutputStream(zipFile);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
 
             byte[] buffer = new byte[8192];
-            for (File file : files) {
-                if (file.isDirectory()) continue;
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    ZipEntry zipEntry = new ZipEntry(file.getName());
-                    zos.putNextEntry(zipEntry);
-                    int length;
-                    while ((length = fis.read(buffer)) > 0) {
-                        zos.write(buffer, 0, length);
+
+            File[] imageFiles = imagesExportDir.listFiles();
+            if (imageFiles != null) {
+                for (File img : imageFiles) {
+                    if (img.isDirectory() || img.getName().endsWith(".zip")) continue;
+                    try (FileInputStream fis = new FileInputStream(img)) {
+                        ZipEntry zipEntry = new ZipEntry(containerName + "/images/" + img.getName());
+                        zos.putNextEntry(zipEntry);
+                        int length;
+                        while ((length = fis.read(buffer)) > 0) {
+                            zos.write(buffer, 0, length);
+                        }
+                        zos.closeEntry();
                     }
-                    zos.closeEntry();
+                }
+            }
+
+            File[] rootFiles = containerExportDir.listFiles();
+            if (rootFiles != null) {
+                for (File rf : rootFiles) {
+                    if (rf.isDirectory() || rf.getName().endsWith(".zip")) continue;
+                    try (FileInputStream fis = new FileInputStream(rf)) {
+                        ZipEntry zipEntry = new ZipEntry(containerName + "/" + rf.getName());
+                        zos.putNextEntry(zipEntry);
+                        int length;
+                        while ((length = fis.read(buffer)) > 0) {
+                            zos.write(buffer, 0, length);
+                        }
+                        zos.closeEntry();
+                    }
                 }
             }
         }
         return zipFile;
+    }
+
+    private void copyFile(File src, File dest) throws IOException {
+        try (FileInputStream in = new FileInputStream(src);
+             FileOutputStream out = new FileOutputStream(dest)) {
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        }
     }
 }

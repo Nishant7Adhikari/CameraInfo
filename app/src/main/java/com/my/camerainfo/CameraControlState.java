@@ -30,7 +30,7 @@ public class CameraControlState {
     public int wbKelvin = 5500;
     public int exposureCompensation = 0;
 
-    public int targetDurationSec = 30; // 0 for BULB
+    public int targetDurationSec = 0; // 0 for 1-shot single photo mode, -1 for BULB
     public int targetFrameCount = 0; // 0 for unlimited
     public long frameIntervalMs = 0; // 0 for max burst rate
 

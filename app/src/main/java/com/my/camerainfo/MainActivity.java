@@ -635,23 +635,34 @@ public class MainActivity extends Activity {
 
             if (cameraControlState.isManualAe) {
                 previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
-                previewRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, cameraControlState.shutterSpeedNs);
-                previewRequestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, cameraControlState.iso);
+                long validShutter = cameraControlState.shutterSpeedNs;
+                if (capabilities != null && capabilities.exposureTimeRange != null) {
+                    validShutter = Math.max(capabilities.exposureTimeRange.getLower(),
+                            Math.min(capabilities.exposureTimeRange.getUpper(), validShutter));
+                }
+                previewRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, validShutter);
+                int validIso = cameraControlState.iso;
+                if (capabilities != null && capabilities.isoRange != null) {
+                    validIso = Math.max(capabilities.isoRange.getLower(),
+                            Math.min(capabilities.isoRange.getUpper(), validIso));
+                }
+                previewRequestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, validIso);
             } else {
-                previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
-                previewRequestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, 400_000_000L); // 0.4s default per frame
-                previewRequestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, cameraControlState.iso);
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
             }
 
             if (cameraControlState.isManualAf) {
                 previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
                 previewRequestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, cameraControlState.focusDistanceDiopters);
+            } else {
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             }
 
+            captureSession.stopRepeating();
             captureSession.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, backgroundHandler);
             Toast.makeText(this, "Long Exposure Started...", Toast.LENGTH_SHORT).show();
 
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "Error starting long exposure session", e);
             isLongExposureActive = false;
         }
@@ -1122,22 +1133,28 @@ public class MainActivity extends Activity {
         } else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
         }
+
+        if (lensFacing == CameraCharacteristics.LENS_FACING_FRONT) {
+            matrix.postScale(-1, 1, centerX, centerY);
+        }
+
         textureView.setTransform(matrix);
     }
 
     private Size chooseOptimalSize(Size[] choices, int textureViewWidth, int textureViewHeight, Size aspectRatio) {
         List<Size> bigEnough = new ArrayList<>();
         List<Size> notBigEnough = new ArrayList<>();
-        int w = aspectRatio.getWidth();
-        int h = aspectRatio.getHeight();
+        double targetRatio = (double) aspectRatio.getWidth() / aspectRatio.getHeight();
+
         for (Size option : choices) {
-            if (option.getWidth() <= 1920 && option.getHeight() <= 1080 &&
-                    option.getHeight() == option.getWidth() * h / w) {
-                if (option.getWidth() >= textureViewWidth &&
-                        option.getHeight() >= textureViewHeight) {
-                    bigEnough.add(option);
-                } else {
-                    notBigEnough.add(option);
+            if (option.getWidth() <= 1920 && option.getHeight() <= 1080) {
+                double optionRatio = (double) option.getWidth() / option.getHeight();
+                if (Math.abs(targetRatio - optionRatio) <= 0.05) {
+                    if (option.getWidth() >= textureViewWidth && option.getHeight() >= textureViewHeight) {
+                        bigEnough.add(option);
+                    } else {
+                        notBigEnough.add(option);
+                    }
                 }
             }
         }
@@ -1147,7 +1164,19 @@ public class MainActivity extends Activity {
         } else if (!notBigEnough.isEmpty()) {
             return Collections.max(notBigEnough, new CompareSizesByArea());
         } else {
-            return choices[0];
+            Size bestMatch = choices[0];
+            double minRatioDiff = Double.MAX_VALUE;
+            for (Size option : choices) {
+                if (option.getWidth() <= 1920 && option.getHeight() <= 1080) {
+                    double optionRatio = (double) option.getWidth() / option.getHeight();
+                    double diff = Math.abs(targetRatio - optionRatio);
+                    if (diff < minRatioDiff) {
+                        minRatioDiff = diff;
+                        bestMatch = option;
+                    }
+                }
+            }
+            return bestMatch;
         }
     }
 
