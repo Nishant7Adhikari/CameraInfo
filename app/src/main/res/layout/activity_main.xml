@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".MainActivity">
+
+    <!-- Camera Viewfinder -->
+    <com.my.camerainfo.AutoFitTextureView
+        android:id="@+id/texture_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <!-- Top Bar: Primary Tabs & Quick Action Icons -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_glass_panel"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Top Header Status -->
+        <TextView
+            android:id="@+id/text_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Initializing Camera..."
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <!-- Navigation Tabs: Normal vs Pro & Computational -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_tab_normal"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_active"
+                android:text="@string/tab_normal"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_tab_pro"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_inactive"
+                android:text="@string/tab_pro"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Secondary Action Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_switch_camera"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_inactive"
+                android:text="SWITCH CAMERA"
+                android:textColor="@color/white"
+                android:textSize="9sp" />
+
+            <Button
+                android:id="@+id/btn_reprocess"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pill_inactive"
+                android:text="@string/btn_reprocess"
+                android:textColor="@color/white"
+                android:textSize="9sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Bottom Controls Container -->
+    <LinearLayout
+        android:id="@+id/bottom_dock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <!-- Exposure Progress Indicator Bar -->
+        <ProgressBar
+            android:id="@+id/progress_bar_exposure"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginBottom="4dp"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_pill_active"
+            android:visibility="gone" />
+
+        <!-- Controls Container Overlay -->
+        <LinearLayout
+            android:id="@+id/manual_controls_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_glass_panel"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- Normal Mode View (Clean Point & Shoot) -->
+            <LinearLayout
+                android:id="@+id/panel_normal_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Point &amp; shoot photo mode • Tap screen to focus"
+                    android:textColor="#CCCCCC"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Pro & Computational Studio View -->
+            <LinearLayout
+                android:id="@+id/panel_pro_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Pro Toggles Row (AE/AF Toggles, AE/AWB Lock, Alignment) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_ae_mode"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="AE: AUTO"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_af_mode"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="AF: AUTO"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_ae_lock"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="AE LOCK"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_awb_lock"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="AWB LOCK"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_alignment"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_active"
+                        android:text="ALIGN: ON"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- Expandable Manual Sliders -->
+                <LinearLayout
+                    android:id="@+id/sliders_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tv_shutter_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Shutter: Auto"
+                        android:textColor="#FFEB3B"
+                        android:textSize="10sp" />
+
+                    <SeekBar
+                        android:id="@+id/sb_shutter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/tv_iso_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="ISO: Auto"
+                        android:textColor="#FFEB3B"
+                        android:textSize="10sp" />
+
+                    <SeekBar
+                        android:id="@+id/sb_iso"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="50" />
+
+                    <TextView
+                        android:id="@+id/tv_focus_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Focus: Auto"
+                        android:textColor="#FFEB3B"
+                        android:textSize="10sp" />
+
+                    <SeekBar
+                        android:id="@+id/sb_focus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="0" />
+                </LinearLayout>
+
+                <!-- Computational Stacking Section Header & Help Button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Target Duration &amp; Algorithm:"
+                        android:textColor="#FFEB3B"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btn_mode_info"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="INFO"
+                        android:textColor="#FFEB3B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Duration Selectors -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_dur_single"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_active"
+                        android:text="1-SHOT"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_dur_5s"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="5s"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_dur_10s"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="10s"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_dur_15s"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="15s"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_dur_30s"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="30s"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_dur_bulb"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="BULB"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- Computational Mode Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_effect_smooth"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_active"
+                        android:text="SMOOTH"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_effect_trails"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="TRAILS"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_effect_night"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="NIGHT"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+
+                    <Button
+                        android:id="@+id/btn_effect_hdr"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="26dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pill_inactive"
+                        android:text="HDR"
+                        android:textColor="@color/white"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Centered Shutter Button Dock -->
+        <RelativeLayout
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="#E6000000"
+            android:paddingBottom="8dp">
+
+            <RelativeLayout
+                android:layout_width="68dp"
+                android:layout_height="68dp"
+                android:layout_centerInParent="true">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_shutter_outer" />
+
+                <Button
+                    android:id="@+id/btn_capture"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bg_shutter_inner" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

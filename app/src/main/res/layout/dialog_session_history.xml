@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#EF1E1E1E"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Capture Container History &amp; Engine"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Select a non-destructively saved container to reprocess with multi-frame computational algorithms."
+        android:textColor="#B0BEC5"
+        android:textSize="11sp" />
+
+    <!-- Container Selector Spinner -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Select Capture Container:"
+        android:textColor="#FFEB3B"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinner_sessions"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_glass_panel"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
+
+    <!-- Container Details View -->
+    <TextView
+        android:id="@+id/tv_session_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#22FFFFFF"
+        android:padding="8dp"
+        android:text="Container Details: Select a session"
+        android:textColor="#E0E0E0"
+        android:textSize="11sp" />
+
+    <!-- Processing Algorithm Selector -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Computational Stacking Algorithm:"
+        android:textColor="#FFEB3B"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/rg_stacking_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_mode_smooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="SMOOTH AVERAGE (Motion blur / silky water)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <RadioButton
+            android:id="@+id/rb_mode_trails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LIGHT TRAILS (Star trails / light painting max accumulation)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <RadioButton
+            android:id="@+id/rb_mode_night"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NIGHT STACK (Multi-frame low-light noise reduction)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <RadioButton
+            android:id="@+id/rb_mode_hdr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HDR MERGE (Dynamic range luminance expansion)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <RadioButton
+            android:id="@+id/rb_mode_deghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MOTION DEGHOSTING (Movement-aware alignment)"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+    </RadioGroup>
+
+    <!-- Handheld Alignment Switch -->
+    <CheckBox
+        android:id="@+id/cb_engine_alignment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:text="Enable Handheld Thumbnail Cross-Correlation Alignment"
+        android:textColor="#00E676"
+        android:textSize="11sp" />
+
+    <!-- Processing Progress Indicator -->
+    <LinearLayout
+        android:id="@+id/container_processing_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_processing_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Processing..."
+            android:textColor="#00E676"
+            android:textSize="11sp" />
+
+        <ProgressBar
+            android:id="@+id/pb_reprocess_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="4dp"
+            android:indeterminate="false"
+            android:max="100" />
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_dialog_close"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_pill_inactive"
+            android:text="CLOSE"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btn_dialog_process"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_pill_active"
+            android:text="PROCESS CONTAINER"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

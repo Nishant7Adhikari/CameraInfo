@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">CameraInfo</string>
+    <string name="tab_normal">NORMAL CAMERA</string>
+    <string name="tab_pro">PRO &amp; COMPUTATIONAL</string>
+
+    <string name="btn_alignment_on">ALIGNMENT: ON</string>
+    <string name="btn_alignment_off">ALIGNMENT: OFF</string>
+    <string name="btn_reprocess">CONTAINER GALLERY</string>
+
+    <string name="single_photo">SINGLE PHOTO</string>
+    <string name="long_exp_title">COMPUTATIONAL LONG EXP</string>
+    <string name="motion_blur_smooth">SMOOTH AVERAGE</string>
+    <string name="light_trails">LIGHT TRAILS</string>
+    <string name="night_stack">NIGHT NOISE REDUCTION</string>
+    <string name="hdr_merge">HDR FUSION</string>
+    <string name="deghosting">MOTION DEGHOSTING</string>
+
+    <string name="capture_single_photo">CAPTURE PHOTO</string>
+    <string name="target_exp_duration">Target Exposure Duration:</string>
+    <string name="processing_effect">Computational Mode:</string>
+
+    <!-- Mode Descriptions -->
+    <string name="desc_smooth_average"><b>Smooth Average (Motion Blur &amp; Silk)</b><br/>Averages pixels across frames. Ideal for silky waterfalls, smooth ocean waves, moving clouds, and erasing moving people from daytime scenes.</string>
+    <string name="desc_light_trails"><b>Light Trails (Star Trails &amp; Fireworks)</b><br/>Retains maximum brightness per pixel. Ideal for night traffic light painting, star trails across the night sky, and fireworks.</string>
+    <string name="desc_night_stack"><b>Night Noise Reduction</b><br/>Multi-frame temporal variance filtering eliminates sensor grain in low light without blurring fine details. Ideal for handheld or tripod dark landscapes.</string>
+    <string name="desc_hdr"><b>HDR Fusion</b><br/>Combines highlight and shadow detail across multi-exposure frames. Ideal for sunsets and high-contrast landscapes.</string>
+    <string name="desc_deghosting"><b>Motion Deghosting</b><br/>Isolates static background from moving subjects to eliminate ghosting artifacts during multi-frame stacking.</string>
+</resources>
